@@ -366,6 +366,11 @@ class Page(QtCore.QObject):
                 self.scene.addItem(item)
                 self.objects.append(item)
 
+    def deleteSelection(self):
+        for item in self.scene.selectedItems():
+            self.scene.removeItem(item)
+            self.objects.remove(item)
+
     def itemSelected(self, item):
         self.parent.itemSelected.emit(item)
 
@@ -436,6 +441,7 @@ class Project(QtCore.QObject):
             self.addPage()
         for page in self.pages:
             page.load(stream)
+        self.changeFont(self.font)
 
     def addPage():
         pass
@@ -474,58 +480,21 @@ class Project(QtCore.QObject):
         os.remove(path+"~2")
     
     def changeFont(self, font):
+        self.font = font
         for page in self.pages:
             page.changeFont(font)
 
 
-class PageView(QtGui.QGraphicsView):
-    zoomChanged = QtCore.pyqtSignal()
-    pageChanged = QtCore.pyqtSignal()
-
-    def __init__(self, scene, parent):
-        QtGui.QGraphicsView.__init__(self, scene, parent)
-        self.zoom = 1
-
-    def updateTransform(self):
-        t = QtGui.QTransform()
-        t.scale(self.zoom, self.zoom)
-        self.setTransform(t)
-        self.zoomChanged.emit()
-
-    def zoomReset(self):
-        self.zoom = 1
-        self.updateTransform()
-
-    def zoomIn(self):
-        self.zoom *= 1.5;
-        self.updateTransform()
-
-    def zoomOut(self):
-        self.zoom /= 1.5;
-        self.updateTransform()
-
-    def wheelEvent(self, event):
-        if event.modifiers() == QtCore.Qt.ControlModifier:
-            self.zoom *= 2.0 ** (event.delta() / 300.0)
-            self.updateTransform()
-        else:
-            QtGui.QGraphicsView.wheelEvent(self, event)
-
-    def currentPageChanged(self, page):
-        self.currentPage = page
-        self.setScene(page.scene if page else None)
-        self.pageChanged.emit()
-
-class App(QtCore.QObject):
+class MainWindow(QtGui.QMainWindow):
     currentPageChanged = QtCore.pyqtSignal(Page)
 
     def setCurrentPage(self, page):
         if page == self.currentPage: return
         self.currentPage = page
         self.currentPageChanged.emit(page)
-        self.main.treeView.clearSelection()
+        self.treeView.clearSelection()
         if page:
-            self.main.treeView.selectionModel().setCurrentIndex(
+            self.treeView.selectionModel().setCurrentIndex(
                 self.project.treeModel.createIndex(0, 0, page), 
                 QtGui.QItemSelectionModel.ClearAndSelect )
 
@@ -541,10 +510,10 @@ class App(QtCore.QObject):
 
     def __init__(self):
         QtCore.QObject.__init__(self)
-        main = uic.loadUi("main.ui")
+        uic.loadUi("main.ui", self)
 
         self.fontCombo = QtGui.QFontComboBox()
-        main.textToolBar.addWidget(self.fontCombo)
+        self.textToolBar.addWidget(self.fontCombo)
         self.fontCombo.currentFontChanged.connect(self.handleFontChange)
 
         self.fontSizeCombo = QtGui.QComboBox()
@@ -552,7 +521,7 @@ class App(QtCore.QObject):
             self.fontSizeCombo.addItem(QtCore.QString("%d"%i))
         v = QtGui.QIntValidator(2, 64, self)
         self.fontSizeCombo.setValidator(v)
-        main.textToolBar.addWidget(self.fontSizeCombo)
+        self.textToolBar.addWidget(self.fontSizeCombo)
         self.fontSizeCombo.currentIndexChanged.connect(self.handleFontChange)
 
      # fontColorToolButton = new QToolButton;
@@ -567,44 +536,31 @@ class App(QtCore.QObject):
      #         this, SLOT(textButtonTriggered()));
 
         project = Project()
-        view = PageView(None, main)
+        #view = PageView(None, main)
         self.currentPage = None
-        main.actionZoomIn.triggered.connect(view.zoomIn)
-        main.actionZoomOut.triggered.connect(view.zoomOut)
-        main.actionResetZoom.triggered.connect(view.zoomReset)
-        main.actionNewProject.triggered.connect(self.newProject)
-        main.actionSaveProject.triggered.connect(self.save)
-        main.actionOpenProject.triggered.connect(self.load)
-        main.actionSaveAs.triggered.connect(self.saveas)
-        main.actionExportPDF.triggered.connect(self.export)
-        #main.actionAddImage.triggered.connect(self.addImage)
-        main.actionAddText.triggered.connect(self.addText)
-        main.actionExportSaveAndQuit.triggered.connect(self.exportSaveAndQuit)
-        main.actionBold.changed.connect(self.handleFontChange)
-        main.actionItalic.changed.connect(self.handleFontChange)
-        main.actionUnderline.changed.connect(self.handleFontChange)
+
+
+        #self.actionAddImage.triggered.connect(self.addImage)
+        self.actionAddText.triggered.connect(self.addText)
+        
         print project.itemSelected
         project.itemSelected.connect(self.itemSelected)
         
         toolGroup = QtGui.QActionGroup(self)
-        toolGroup.addAction(main.actionSizeTool)
-        toolGroup.addAction(main.actionRectangleTool)
-        toolGroup.addAction(main.actionLineTool)
-        toolGroup.addAction(main.actionTextTool)
-        main.actionSizeTool.setChecked(True)
+        toolGroup.addAction(self.actionSizeTool)
+        toolGroup.addAction(self.actionRectangleTool)
+        toolGroup.addAction(self.actionLineTool)
+        toolGroup.addAction(self.actionTextTool)
+        self.actionSizeTool.setChecked(True)
 
-        main.setCentralWidget(view)
-        main.treeView.setModel(project.treeModel)
-        main.treeView.selectionModel().currentChanged.connect(self.currentObjectChanged)
-        self.currentPageChanged.connect(view.currentPageChanged)
+        self.treeView.setModel(project.treeModel)
+        self.treeView.selectionModel().currentChanged.connect(self.currentObjectChanged)
+
+        self.currentPageChanged.connect(self.view.currentPageChanged)
         
-        self.view = view
-        self.main = main
         self.project = project
 
         self.handleFontChange()
-        view.show()
-        main.show()
         
 
     def doNewProject(self, path):
@@ -615,20 +571,20 @@ class App(QtCore.QObject):
 
     def newProject(self):
         path = QtGui.QFileDialog.getOpenFileName(
-            self.main, "Open pdf file", "", "Pdf Docuemnts (*.pdf);;All files (*)")
+            self, "Open pdf file", "", "Pdf Docuemnts (*.pdf);;All files (*)")
         if path: self.doNewProject(path)
 
     def export(self):
         a,e = os.path.splitext(str(self.project.path))
         path = a+"_ann.pdf"
         # path = QtGui.QFileDialog.getSaveFileName(
-        #     self.main, "Export pdf", "", "Pdf Docuemnts (*.pdf);;All files (*)")
+        #     self, "Export pdf", "", "Pdf Docuemnts (*.pdf);;All files (*)")
         if path:
             self.project.export(path)
 
     def saveas(self):
         path = QtGui.QFileDialog.getSaveFileName(
-            self.main, "Save Project", self.project.path if self.project.path else "", 
+            self, "Save Project", self.project.path if self.project.path else "", 
             "Pro Docuemnts (*.pro);;All files (*)")
         if path:
             self.project.saveas(path)
@@ -640,7 +596,7 @@ class App(QtCore.QObject):
 
     def load(self):
         path = QtGui.QFileDialog.getOpenFileName(
-            self.main, "Open Project", self.project.path if self.project.path else "",
+            self, "Open Project", self.project.path if self.project.path else "",
             "Pro Docuemnts (*.pro);;All files (*)")
         if path: self.doLoad(path)
 
@@ -650,7 +606,7 @@ class App(QtCore.QObject):
 
     def addImage(self):
         path = QtGui.QFileDialog.getOpenFileName(
-            self.main, "Add image", "",
+            self, "Add image", "",
             "Image Formats (*.bmp *.jgp *.jpeg *.mng *.png *.pbm *.ppm *.tiff);;All files(*)")
         if path:
             pass
@@ -658,27 +614,30 @@ class App(QtCore.QObject):
     def addText(self):
         self.currentPage.addText()
 
+    def deleteSelection(self):
+        self.currentPage.deleteSelection()
+
     def exportSaveAndQuit(self):
         self.save()
         self.export()
-        self.main.close()
+        self.close()
 
     def handleFontChange(self, *_):
         font = self.fontCombo.currentFont()
         font.setPointSize(self.fontSizeCombo.currentText().toInt()[0])
-        font.setWeight(QtGui.QFont.Bold if self.main.actionBold.isChecked() else QtGui.QFont.Normal)
-        font.setItalic(self.main.actionItalic.isChecked())
-        font.setUnderline(self.main.actionUnderline.isChecked())
+        font.setWeight(QtGui.QFont.Bold if self.actionBold.isChecked() else QtGui.QFont.Normal)
+        font.setItalic(self.actionItalic.isChecked())
+        font.setUnderline(self.actionUnderline.isChecked())
         self.project.changeFont(font)
 
     def itemSelected(item):
         font = item.font()
         color = item.defaultTextColor()
-        self.main.fontCombo.setCurrentFont(font)
-        self.main.fontSizeCombo.setEditText(QtCore.QString().setNum(font.pointSize()))
-        self.main.boldAction.setChecked(font.weight() == QtGui.QFont.Bold);
-        self.main.italicAction.setChecked(font.italic());
-        self.main.underlineAction.setChecked(font.underline());
+        self.fontCombo.setCurrentFont(font)
+        self.fontSizeCombo.setEditText(QtCore.QString().setNum(font.pointSize()))
+        self.boldAction.setChecked(font.weight() == QtGui.QFont.Bold);
+        self.italicAction.setChecked(font.italic());
+        self.underlineAction.setChecked(font.underline());
 
 
 def main():
@@ -686,17 +645,18 @@ def main():
     app = QtGui.QApplication(sys.argv)
 
 
-    QtGui.QIcon.setThemeName("oxygen")
+    #print QtGui.QIcon.setThemeName("oxygen")
 
     print QtGui.QIcon.fromTheme("document-new")
-    print QtGui.QIcon.fromTheme("document-save")
 
-    print "HAT"
-    for path in QtGui.QIcon.themeSearchPaths():
-        print "%s/%s" % (path, QtGui.QIcon.themeName())
+    # print QtGui.QIcon.fromTheme("document-new")
+    # print QtGui.QIcon.fromTheme("document-save")
 
-
-    a=App()
+    # for path in QtGui.QIcon.themeSearchPaths():
+    #     print "%s/%s" % (path, QtGui.QIcon.themeName())
+    
+    a=MainWindow()
+    a.show()
     if len(app.arguments()) > 1:
         pep=os.path.splitext(str(app.arguments()[1]))[0]+".pep"
         if os.path.exists(pep):

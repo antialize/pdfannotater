@@ -14,7 +14,17 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout"/>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="margin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="PageView" name="view"/>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -22,7 +32,7 @@
      <x>0</x>
      <y>0</y>
      <width>1142</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFoobar">
@@ -281,13 +291,24 @@
    <addaction name="actionItalic"/>
    <addaction name="actionUnderline"/>
   </widget>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
   <action name="actionNewProject">
    <property name="icon">
     <iconset theme="document-new">
      <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
    </property>
    <property name="text">
-    <string>&amp;New Project</string>
+    <string>&amp;New Project...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+N</string>
@@ -299,7 +320,7 @@
      <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
    </property>
    <property name="text">
-    <string>&amp;Open Project</string>
+    <string>&amp;Open Project...</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -664,6 +685,21 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PageView</class>
+   <extends>QGraphicsView</extends>
+   <header>pageview.h</header>
+   <slots>
+    <signal>zoomChanged()</signal>
+    <signal>pageChanged()</signal>
+    <slot>currentPageChanged(Page*)</slot>
+    <slot>zoomReset()</slot>
+    <slot>zoomIn()</slot>
+    <slot>zoomOut()</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
@@ -746,5 +782,224 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionZoomIn</sender>
+   <signal>triggered()</signal>
+   <receiver>view</receiver>
+   <slot>zoomIn()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>689</x>
+     <y>438</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionZoomOut</sender>
+   <signal>triggered()</signal>
+   <receiver>view</receiver>
+   <slot>zoomOut()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>689</x>
+     <y>438</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionResetZoom</sender>
+   <signal>triggered()</signal>
+   <receiver>view</receiver>
+   <slot>zoomReset()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>689</x>
+     <y>438</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSaveAs</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>saveas()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>570</x>
+     <y>416</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionNewProject</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>newProject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>570</x>
+     <y>416</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSaveProject</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>save()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>570</x>
+     <y>416</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionOpenProject</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>load()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>570</x>
+     <y>416</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExportPDF</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>export()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>570</x>
+     <y>416</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExportSaveAndQuit</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>exportSaveAndQuit()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>570</x>
+     <y>416</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionBold</sender>
+   <signal>changed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleFontChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>570</x>
+     <y>416</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionUnderline</sender>
+   <signal>changed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleFontChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>570</x>
+     <y>416</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionItalic</sender>
+   <signal>changed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>handleFontChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>570</x>
+     <y>416</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionDelete</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>deleteSelection()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>570</x>
+     <y>416</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <signal>currentPageChanged(Page*)</signal>
+  <slot>save()</slot>
+  <slot>load()</slot>
+  <slot>saveas()</slot>
+  <slot>export()</slot>
+  <slot>newProject()</slot>
+  <slot>exportSaveAndQuit()</slot>
+  <slot>handleFontChange()</slot>
+  <slot>deleteSelection()</slot>
+ </slots>
 </ui>
