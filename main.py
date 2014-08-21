@@ -233,16 +233,18 @@ class RectItem(ItemBase):
 
 
 class TextItem(QtGui.QGraphicsTextItem):
-    def __init__(self, page):
+    def __init__(self, page, font=None):
         QtGui.QGraphicsTextItem.__init__(self)
         self.page = page
-        self.isHovering=False
-        self.setAcceptHoverEvents(True)
+        #self.isHovering=False
+        #self.setAcceptHoverEvents(True)
         self.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
         self.setDefaultTextColor(QtCore.Qt.red)
         self.setPlainText("Hello")
-        self.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
+        if font:
+            self.setFont(font)
+        #self.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
     
     def save(self, s):
         s << self.toHtml()
@@ -269,6 +271,18 @@ class TextItem(QtGui.QGraphicsTextItem):
         c.select(QtGui.QTextCursor.Document)
         c.insertHtml("Boo")
         setTextCursor(c)
+
+    def focusOutEvent(self, event):
+        self.setTextInteractionFlags(QtCore.Qt.NoTextInteraction)
+        c = self.textCursor()
+        c.clearSelection()
+        self.setTextCursor(c)
+        QtGui.QGraphicsTextItem.focusOutEvent(self, event)
+
+    def mouseDoubleClickEvent(self, event):
+        if self.textInteractionFlags() == QtCore.Qt.NoTextInteraction:
+            self.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
+        QtGui.QGraphicsTextItem.mouseDoubleClickEvent(self, event)
 
 
 class ObjectTreeModel(QtCore.QAbstractItemModel):
@@ -330,7 +344,7 @@ class Page(QtCore.QObject):
         self.selectedItem = None
 
     def addText(self):
-        text = TextItem(self)
+        text = TextItem(self, self.myFont)
         text.setPos(a.view.mapToScene(a.view.mapFromGlobal(QtGui.QCursor.pos())))
         self.scene.addItem(text)
         self.objects.append(text)
@@ -352,7 +366,18 @@ class Page(QtCore.QObject):
                 self.scene.addItem(item)
                 self.objects.append(item)
 
+    def itemSelected(self, item):
+        self.parent.itemSelected.emit(item)
+
+    def changeFont(self, font):
+        self.myFont = font
+        for item in self.scene.selectedItems():
+            if isinstance(item, TextItem):
+                item.setFont(font)
+
 class Project(QtCore.QObject):
+    itemSelected = QtCore.pyqtSignal([QtGui.QGraphicsItem])
+
     def __init__(self):
         QtCore.QObject.__init__(self)
         self.undoStack = QtGui.QUndoStack()
@@ -447,8 +472,16 @@ class Project(QtCore.QObject):
         subprocess.call(["pdftk", path+"~1", "multibackground", path+"~2", "output", path])
         os.remove(path+"~1")
         os.remove(path+"~2")
-        
+    
+    def changeFont(self, font):
+        for page in self.pages:
+            page.changeFont(font)
+
+
 class PageView(QtGui.QGraphicsView):
+    zoomChanged = QtCore.pyqtSignal()
+    pageChanged = QtCore.pyqtSignal()
+
     def __init__(self, scene, parent):
         QtGui.QGraphicsView.__init__(self, scene, parent)
         self.zoom = 1
@@ -457,6 +490,7 @@ class PageView(QtGui.QGraphicsView):
         t = QtGui.QTransform()
         t.scale(self.zoom, self.zoom)
         self.setTransform(t)
+        self.zoomChanged.emit()
 
     def zoomReset(self):
         self.zoom = 1
@@ -478,7 +512,9 @@ class PageView(QtGui.QGraphicsView):
             QtGui.QGraphicsView.wheelEvent(self, event)
 
     def currentPageChanged(self, page):
+        self.currentPage = page
         self.setScene(page.scene if page else None)
+        self.pageChanged.emit()
 
 class App(QtCore.QObject):
     currentPageChanged = QtCore.pyqtSignal(Page)
@@ -506,6 +542,30 @@ class App(QtCore.QObject):
     def __init__(self):
         QtCore.QObject.__init__(self)
         main = uic.loadUi("main.ui")
+
+        self.fontCombo = QtGui.QFontComboBox()
+        main.textToolBar.addWidget(self.fontCombo)
+        self.fontCombo.currentFontChanged.connect(self.handleFontChange)
+
+        self.fontSizeCombo = QtGui.QComboBox()
+        for i in range(8, 30, 2):
+            self.fontSizeCombo.addItem(QtCore.QString("%d"%i))
+        v = QtGui.QIntValidator(2, 64, self)
+        self.fontSizeCombo.setValidator(v)
+        main.textToolBar.addWidget(self.fontSizeCombo)
+        self.fontSizeCombo.currentIndexChanged.connect(self.handleFontChange)
+
+     # fontColorToolButton = new QToolButton;
+     # fontColorToolButton->setPopupMode(QToolButton::MenuButtonPopup);
+     # fontColorToolButton->setMenu(createColorMenu(SLOT(textColorChanged()),
+     #                                              Qt::black));
+     # textAction = fontColorToolButton->menu()->defaultAction();
+     # fontColorToolButton->setIcon(createColorToolButtonIcon(
+     # ":/images/textpointer.png", Qt::black));
+     # fontColorToolButton->setAutoFillBackground(true);
+     # connect(fontColorToolButton, SIGNAL(clicked()),
+     #         this, SLOT(textButtonTriggered()));
+
         project = Project()
         view = PageView(None, main)
         self.currentPage = None
@@ -520,8 +580,12 @@ class App(QtCore.QObject):
         #main.actionAddImage.triggered.connect(self.addImage)
         main.actionAddText.triggered.connect(self.addText)
         main.actionExportSaveAndQuit.triggered.connect(self.exportSaveAndQuit)
-
-
+        main.actionBold.changed.connect(self.handleFontChange)
+        main.actionItalic.changed.connect(self.handleFontChange)
+        main.actionUnderline.changed.connect(self.handleFontChange)
+        print project.itemSelected
+        project.itemSelected.connect(self.itemSelected)
+        
         toolGroup = QtGui.QActionGroup(self)
         toolGroup.addAction(main.actionSizeTool)
         toolGroup.addAction(main.actionRectangleTool)
@@ -537,14 +601,17 @@ class App(QtCore.QObject):
         self.view = view
         self.main = main
         self.project = project
+
+        self.handleFontChange()
         view.show()
         main.show()
-
+        
 
     def doNewProject(self, path):
         self.setCurrentPage(None)
         self.project.create(path)
         if self.project.pages: self.setCurrentPage(self.project.pages[0])
+        self.handleFontChange()
 
     def newProject(self):
         path = QtGui.QFileDialog.getOpenFileName(
@@ -596,9 +663,39 @@ class App(QtCore.QObject):
         self.export()
         self.main.close()
 
+    def handleFontChange(self, *_):
+        font = self.fontCombo.currentFont()
+        font.setPointSize(self.fontSizeCombo.currentText().toInt()[0])
+        font.setWeight(QtGui.QFont.Bold if self.main.actionBold.isChecked() else QtGui.QFont.Normal)
+        font.setItalic(self.main.actionItalic.isChecked())
+        font.setUnderline(self.main.actionUnderline.isChecked())
+        self.project.changeFont(font)
+
+    def itemSelected(item):
+        font = item.font()
+        color = item.defaultTextColor()
+        self.main.fontCombo.setCurrentFont(font)
+        self.main.fontSizeCombo.setEditText(QtCore.QString().setNum(font.pointSize()))
+        self.main.boldAction.setChecked(font.weight() == QtGui.QFont.Bold);
+        self.main.italicAction.setChecked(font.italic());
+        self.main.underlineAction.setChecked(font.underline());
+
+
 def main():
     global a
     app = QtGui.QApplication(sys.argv)
+
+
+    QtGui.QIcon.setThemeName("oxygen")
+
+    print QtGui.QIcon.fromTheme("document-new")
+    print QtGui.QIcon.fromTheme("document-save")
+
+    print "HAT"
+    for path in QtGui.QIcon.themeSearchPaths():
+        print "%s/%s" % (path, QtGui.QIcon.themeName())
+
+
     a=App()
     if len(app.arguments()) > 1:
         pep=os.path.splitext(str(app.arguments()[1]))[0]+".pep"

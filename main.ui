@@ -22,7 +22,7 @@
      <x>0</x>
      <y>0</y>
      <width>1142</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFoobar">
@@ -203,9 +203,6 @@
        </item>
       </widget>
      </item>
-     <item>
-      <widget class="QFontComboBox" name="fontComboBox_2"/>
-     </item>
     </layout>
    </widget>
   </widget>
@@ -283,8 +280,6 @@
    <addaction name="actionBold"/>
    <addaction name="actionItalic"/>
    <addaction name="actionUnderline"/>
-   <addaction name="actionFont"/>
-   <addaction name="actionColor"/>
   </widget>
   <action name="actionNewProject">
    <property name="icon">
