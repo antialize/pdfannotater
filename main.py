@@ -510,7 +510,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def __init__(self):
         QtCore.QObject.__init__(self)
-        uic.loadUi("main.ui", self)
+        uic.loadUi(os.path.join(os.path.dirname(os.path.realpath(__file__)), "main.ui"), self)
 
         self.fontCombo = QtGui.QFontComboBox()
         self.textToolBar.addWidget(self.fontCombo)
