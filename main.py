@@ -391,6 +391,12 @@ class Page(QtCore.QObject):
             pos.y() - font_metrics.ascent() - font_metrics.leading() - 1)
         self.scene.addItem(text)
         self.objects.append(text)
+        text.setSelected(True)
+        text.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
+        selection = text.textCursor()
+        selection.select(QtGui.QTextCursor.Document)
+        text.setTextCursor(selection)
+        text.setFocus()
 
     def save(self, stream):
         stream.writeUInt32(len(self.objects))
