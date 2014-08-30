@@ -39,8 +39,11 @@ class PdfPageItem(QtGui.QGraphicsItem):
         left = math.floor(r.left()*d)
         bottom = math.ceil(r.bottom()*d)
         right = math.ceil(r.right()*d)
-        image = self.page.renderToImage(75*d, 75*d, left, top, right-left, bottom-top)
-        painter.drawImage(QtCore.QRectF(left/d, top/d, (right-left)/d, (bottom-top)/d), image)
+        image = self.page.renderToImage(
+            75*d, 75*d, left, top, right-left, bottom-top)
+        painter.drawImage(
+            QtCore.QRectF(left/d, top/d, (right-left)/d, (bottom-top)/d),
+            image)
 
 
 class PropertiesModel(QtCore.QAbstractTableModel):
@@ -119,7 +122,8 @@ class ItemBase(QtGui.QGraphicsItem):
 
     def mousePressEvent(self, event):
         p = event.pos()
-        self.resizeTop = self.resizeBottom = self.resizeLeft = self.resizeRight = False
+        self.resizeTop = self.resizeBottom = False
+        self.resizeLeft = self.resizeRight = False
         self.moveStart = None
         self.startRect = QtCore.QRectF(self.innerRect)
         self.myEvent = False
@@ -131,7 +135,8 @@ class ItemBase(QtGui.QGraphicsItem):
                 self.resizeLeft = self.onLeft(p)
                 self.resizeRight = self.onRight(p)
 
-            if not self.resizeTop and not self.resizeBottom and not self.resizeLeft and not self.resizeRight:
+            if (not self.resizeTop and not self.resizeBottom
+                    and not self.resizeLeft and not self.resizeRight):
                 if event.modifiers() == QtCore.Qt.ControlModifier:
                     self.moveStart = (self.innerRect.topLeft(), p)
                     self.myEvent = True
@@ -156,8 +161,9 @@ class ItemBase(QtGui.QGraphicsItem):
                 self.innerRect.setRight(p.x())
             self.commandName = "Resize item"
             if self.moveStart:
-                self.innerRect.moveTo(self.moveStart[0].x() + p.x() - self.moveStart[1].x(),
-                                      self.moveStart[0].y() + p.y() - self.moveStart[1].y())
+                self.innerRect.moveTo(
+                    self.moveStart[0].x() + p.x() - self.moveStart[1].x(),
+                    self.moveStart[0].y() + p.y() - self.moveStart[1].y())
                 self.commandName = "Move item"
         else:
             QtGui.QGraphicsItem.mouseMoveEvent(self, event)
@@ -165,7 +171,9 @@ class ItemBase(QtGui.QGraphicsItem):
     def mouseReleaseEvent(self, event):
         if self.myEvent:
             if self.innerRect != self.startRect:
-                GeometryCommand(self, self.startRect, QtCore.QRectF(self.innerRect), self.commandName)
+                GeometryCommand(
+                    self, self.startRect,
+                    QtCore.QRectF(self.innerRect), self.commandName)
         else:
             QtGui.QGraphicsItem.mouseReleaseEvent(self, event)
 
@@ -199,11 +207,14 @@ class ImageItem(ItemBase):
     def __init__(self, page):
         ItemBase.__init__(self, page)
         self.image = QtGui.QImage("/home/jakobt/tux2.png")
-        self.innerRect = QtCore.QRectF(100, 100, self.image.width(), self.image.height())
+        self.innerRect = QtCore.QRectF(
+            100, 100, self.image.width(), self.image.height())
 
     def paint(self, painter, option, widget):
         painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, True)
-        painter.drawImage(self.innerRect, self.image, QtCore.QRectF(0, 0, self.image.width(), self.image.height()))
+        painter.drawImage(self.innerRect, self.image,
+                          QtCore.QRectF(
+                              0, 0, self.image.width(), self.image.height()))
         ItemBase.paint(self, painter, option, widget)
 
     def getName(self):
@@ -370,7 +381,8 @@ class Page(QtCore.QObject):
 
     def addText(self):
         text = TextItem(self, self.myFont)
-        text.setPos(a.view.mapToScene(a.view.mapFromGlobal(QtGui.QCursor.pos())))
+        text.setPos(
+            a.view.mapToScene(a.view.mapFromGlobal(QtGui.QCursor.pos())))
         self.scene.addItem(text)
         self.objects.append(text)
 
@@ -422,8 +434,10 @@ class Project(QtCore.QObject):
         self.undoStack.clear()
         self.pdfData = pdfData
         self.document = popplerqt4.Poppler.Document.loadFromData(pdfData)
-        self.document.setRenderHint(popplerqt4.Poppler.Document.Antialiasing, True)
-        self.document.setRenderHint(popplerqt4.Poppler.Document.TextAntialiasing, True)
+        self.document.setRenderHint(
+            popplerqt4.Poppler.Document.Antialiasing, True)
+        self.document.setRenderHint(
+            popplerqt4.Poppler.Document.TextAntialiasing, True)
         self.pages = [Page(self, i) for i in range(self.document.numPages())]
 
     def create(self, path):
@@ -495,7 +509,8 @@ class Project(QtCore.QObject):
             page.pageItem.hide()
             bg = page.scene.backgroundBrush()
             page.scene.setBackgroundBrush(QtGui.QBrush(QtCore.Qt.NoBrush))
-            page.scene.render(painter, QtCore.QRectF(), page.pageItem.boundingRect())
+            page.scene.render(
+                painter, QtCore.QRectF(), page.pageItem.boundingRect())
             page.scene.setBackgroundBrush(bg)
             page.pageItem.show()
         painter.end()
@@ -505,7 +520,10 @@ class Project(QtCore.QObject):
         f.open(QtCore.QIODevice.WriteOnly)
         f.write(self.pdfData)
         f.close()
-        subprocess.call(["pdftk", path+"~1", "multibackground", path+"~2", "output", path])
+        subprocess.call(
+            ["pdftk", path+"~1",
+             "multibackground", path+"~2",
+             "output", path])
         os.remove(path+"~1")
         os.remove(path+"~2")
 
@@ -541,7 +559,10 @@ class MainWindow(QtGui.QMainWindow):
 
     def __init__(self):
         QtCore.QObject.__init__(self)
-        uic.loadUi(os.path.join(os.path.dirname(os.path.realpath(__file__)), "main.ui"), self)
+        uic.loadUi(
+            os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                         "main.ui"),
+            self)
 
         self.fontCombo = QtGui.QFontComboBox()
         self.textToolBar.addWidget(self.fontCombo)
@@ -584,7 +605,8 @@ class MainWindow(QtGui.QMainWindow):
         self.actionSizeTool.setChecked(True)
 
         self.treeView.setModel(project.treeModel)
-        self.treeView.selectionModel().currentChanged.connect(self.currentObjectChanged)
+        self.treeView.selectionModel().currentChanged.connect(
+            self.currentObjectChanged)
 
         self.currentPageChanged.connect(self.view.currentPageChanged)
 
@@ -615,7 +637,8 @@ class MainWindow(QtGui.QMainWindow):
 
     def saveas(self):
         path = QtGui.QFileDialog.getSaveFileName(
-            self, "Save Project", self.project.path if self.project.path else "",
+            self, "Save Project",
+            self.project.path if self.project.path else "",
             "Pro Docuemnts (*.pro);;All files (*)")
         if path:
             self.project.saveas(path)
@@ -628,7 +651,8 @@ class MainWindow(QtGui.QMainWindow):
 
     def load(self):
         path = QtGui.QFileDialog.getOpenFileName(
-            self, "Open Project", self.project.path if self.project.path else "",
+            self, "Open Project",
+            self.project.path if self.project.path else "",
             "Pro Docuemnts (*.pro);;All files (*)")
         if path:
             self.doLoad(path)
@@ -642,7 +666,8 @@ class MainWindow(QtGui.QMainWindow):
     def addImage(self):
         path = QtGui.QFileDialog.getOpenFileName(
             self, "Add image", "",
-            "Image Formats (*.bmp *.jgp *.jpeg *.mng *.png *.pbm *.ppm *.tiff);;All files(*)")
+            "Image Formats (*.bmp *.jgp *.jpeg *.mng *.png *.pbm *.ppm "
+            "*.tiff);;All files(*)")
         if path:
             pass
 
@@ -660,7 +685,9 @@ class MainWindow(QtGui.QMainWindow):
     def handleFontChange(self, *_):
         font = self.fontCombo.currentFont()
         font.setPointSize(self.fontSizeCombo.currentText().toInt()[0])
-        font.setWeight(QtGui.QFont.Bold if self.actionBold.isChecked() else QtGui.QFont.Normal)
+        font.setWeight(QtGui.QFont.Bold
+                       if self.actionBold.isChecked()
+                       else QtGui.QFont.Normal)
         font.setItalic(self.actionItalic.isChecked())
         font.setUnderline(self.actionUnderline.isChecked())
         self.project.changeFont(font)
@@ -669,7 +696,8 @@ class MainWindow(QtGui.QMainWindow):
         font = item.font()
         color = item.defaultTextColor()
         self.fontCombo.setCurrentFont(font)
-        self.fontSizeCombo.setEditText(QtCore.QString().setNum(font.pointSize()))
+        self.fontSizeCombo.setEditText(
+            QtCore.QString().setNum(font.pointSize()))
         self.boldAction.setChecked(font.weight() == QtGui.QFont.Bold)
         self.italicAction.setChecked(font.italic())
         self.underlineAction.setChecked(font.underline())
