@@ -262,6 +262,9 @@ class TextItem(QtGui.QGraphicsTextItem):
         self.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
         self.setDefaultTextColor(QtCore.Qt.red)
+        document = QtGui.QTextDocument()
+        document.setDocumentMargin(0)
+        self.setDocument(document)
         self.setPlainText("Hello")
         if font:
             self.setFont(font)
