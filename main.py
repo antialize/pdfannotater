@@ -606,7 +606,6 @@ class MainWindow(QtGui.QMainWindow):
         # self.actionAddImage.triggered.connect(self.addImage)
         self.actionAddText.triggered.connect(self.addText)
 
-        print project.itemSelected
         project.itemSelected.connect(self.itemSelected)
 
         toolGroup = QtGui.QActionGroup(self)
@@ -718,16 +717,6 @@ class MainWindow(QtGui.QMainWindow):
 def main():
     global a
     app = QtGui.QApplication(sys.argv)
-
-    # print QtGui.QIcon.setThemeName("oxygen")
-
-    print QtGui.QIcon.fromTheme("document-new")
-
-    # print QtGui.QIcon.fromTheme("document-new")
-    # print QtGui.QIcon.fromTheme("document-save")
-
-    # for path in QtGui.QIcon.themeSearchPaths():
-    #     print "%s/%s" % (path, QtGui.QIcon.themeName())
 
     a = MainWindow()
     a.show()
