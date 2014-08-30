@@ -95,7 +95,7 @@ class ItemBase(QtGui.QGraphicsItem):
             else:
                 pen = QtGui.QPen(QtCore.Qt.black, 0, QtCore.Qt.DotLine)
 
-            #painter.setCompositionMode(QtGui.QPainter.RasterOp_SourceXorDestination)
+            # painter.setCompositionMode(QtGui.QPainter.RasterOp_SourceXorDestination)
             painter.setPen(pen)
             painter.setBrush(QtCore.Qt.NoBrush)
             r = QtCore.QRectF(self.innerRect)
@@ -124,7 +124,7 @@ class ItemBase(QtGui.QGraphicsItem):
         self.startRect = QtCore.QRectF(self.innerRect)
         self.myEvent = False
         if event.button() == QtCore.Qt.LeftButton:
-            #self.page.select(self)
+            # self.page.select(self)
             if event.modifiers() != QtCore.Qt.ControlModifier:
                 self.resizeTop = self.onTop(p)
                 self.resizeBottom = self.onBottom(p)
@@ -246,15 +246,15 @@ class TextItem(QtGui.QGraphicsTextItem):
     def __init__(self, page, font=None):
         QtGui.QGraphicsTextItem.__init__(self)
         self.page = page
-        #self.isHovering=False
-        #self.setAcceptHoverEvents(True)
+        # self.isHovering=False
+        # self.setAcceptHoverEvents(True)
         self.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
         self.setDefaultTextColor(QtCore.Qt.red)
         self.setPlainText("Hello")
         if font:
             self.setFont(font)
-        #self.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
+        # self.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
 
     def save(self, s):
         s << self.toHtml()
@@ -567,10 +567,10 @@ class MainWindow(QtGui.QMainWindow):
         #         this, SLOT(textButtonTriggered()));
 
         project = Project()
-        #view = PageView(None, main)
+        # view = PageView(None, main)
         self.currentPage = None
 
-        #self.actionAddImage.triggered.connect(self.addImage)
+        # self.actionAddImage.triggered.connect(self.addImage)
         self.actionAddText.triggered.connect(self.addText)
 
         print project.itemSelected
@@ -679,7 +679,7 @@ def main():
     global a
     app = QtGui.QApplication(sys.argv)
 
-    #print QtGui.QIcon.setThemeName("oxygen")
+    # print QtGui.QIcon.setThemeName("oxygen")
 
     print QtGui.QIcon.fromTheme("document-new")
 
