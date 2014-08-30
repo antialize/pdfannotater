@@ -24,7 +24,7 @@ class PdfPageItem(QtGui.QGraphicsItem):
     def __init__(self, page):
         QtGui.QGraphicsItem.__init__(self)
         self.page = page
-        tmp=page.renderToImage(75, 75)
+        tmp = page.renderToImage(75, 75)
         self.rect = QtCore.QRectF(0, 0, tmp.width(), tmp.height())
         self.setFlag(QtGui.QGraphicsItem.ItemUsesExtendedStyleOption, True)
 
