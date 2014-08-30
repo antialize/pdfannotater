@@ -384,8 +384,11 @@ class Page(QtCore.QObject):
 
     def addText(self):
         text = TextItem(self, self.myFont)
+        font_metrics = QtGui.QFontMetrics(text.font())
+        pos = a.view.mapToScene(a.view.mapFromGlobal(QtGui.QCursor.pos()))
         text.setPos(
-            a.view.mapToScene(a.view.mapFromGlobal(QtGui.QCursor.pos())))
+            pos.x(),
+            pos.y() - font_metrics.ascent() - font_metrics.leading() - 1)
         self.scene.addItem(text)
         self.objects.append(text)
 
