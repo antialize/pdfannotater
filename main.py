@@ -91,9 +91,9 @@ class ItemBase(QtGui.QGraphicsItem):
     def paint(self, painter, option, widget):
         if self.isHovering or self.isSelected():
             if self.isSelected():
-                pen = QtGui.QPen( QtCore.Qt.black, 0, QtCore.Qt.SolidLine)
+                pen = QtGui.QPen(QtCore.Qt.black, 0, QtCore.Qt.SolidLine)
             else:
-                pen = QtGui.QPen( QtCore.Qt.black, 0, QtCore.Qt.DotLine)
+                pen = QtGui.QPen(QtCore.Qt.black, 0, QtCore.Qt.DotLine)
 
             #painter.setCompositionMode(QtGui.QPainter.RasterOp_SourceXorDestination);
             painter.setPen(pen)
@@ -156,8 +156,8 @@ class ItemBase(QtGui.QGraphicsItem):
                 self.innerRect.setRight(p.x())
             self.commandName = "Resize item"
             if self.moveStart:
-                self.innerRect.moveTo( self.moveStart[0].x() + p.x() - self.moveStart[1].x(),
-                                       self.moveStart[0].y() + p.y() - self.moveStart[1].y())
+                self.innerRect.moveTo(self.moveStart[0].x() + p.x() - self.moveStart[1].x(),
+                                      self.moveStart[0].y() + p.y() - self.moveStart[1].y())
                 self.commandName = "Move item"
         else:
             QtGui.QGraphicsItem.mouseMoveEvent(self, event)
@@ -424,7 +424,7 @@ class Project(QtCore.QObject):
         self.document = popplerqt4.Poppler.Document.loadFromData(pdfData)
         self.document.setRenderHint(popplerqt4.Poppler.Document.Antialiasing, True)
         self.document.setRenderHint(popplerqt4.Poppler.Document.TextAntialiasing, True)
-        self.pages = [ Page(self, i) for i in range(self.document.numPages()) ]
+        self.pages = [Page(self, i) for i in range(self.document.numPages())]
 
     def create(self, path):
         pdf = QtCore.QFile(path)
@@ -527,7 +527,7 @@ class MainWindow(QtGui.QMainWindow):
         if page:
             self.treeView.selectionModel().setCurrentIndex(
                 self.project.treeModel.createIndex(0, 0, page),
-                QtGui.QItemSelectionModel.ClearAndSelect )
+                QtGui.QItemSelectionModel.ClearAndSelect)
 
     def getCurrentPage(self):
         return self.currentPage
