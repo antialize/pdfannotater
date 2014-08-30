@@ -634,7 +634,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def newProject(self):
         path = QtGui.QFileDialog.getOpenFileName(
-            self, "Open pdf file", "", "Pdf Docuemnts (*.pdf);;All files (*)")
+            self, "Open PDF file", "", "PDF document (*.pdf);;All files (*)")
         if path:
             self.doNewProject(path)
 
@@ -642,7 +642,7 @@ class MainWindow(QtGui.QMainWindow):
         a, e = os.path.splitext(str(self.project.path))
         path = a+"_ann.pdf"
         # path = QtGui.QFileDialog.getSaveFileName(
-        #     self, "Export pdf", "", "Pdf Docuemnts (*.pdf);;All files (*)")
+        #     self, "Export pdf", "", "Pdf Documents (*.pdf);;All files (*)")
         if path:
             self.project.export(path)
 
@@ -650,7 +650,7 @@ class MainWindow(QtGui.QMainWindow):
         path = QtGui.QFileDialog.getSaveFileName(
             self, "Save Project",
             self.project.path if self.project.path else "",
-            "Pro Docuemnts (*.pro);;All files (*)")
+            "Pro Documents (*.pro);;All files (*)")
         if path:
             self.project.saveas(path)
 
@@ -664,7 +664,7 @@ class MainWindow(QtGui.QMainWindow):
         path = QtGui.QFileDialog.getOpenFileName(
             self, "Open Project",
             self.project.path if self.project.path else "",
-            "Pro Docuemnts (*.pro);;All files (*)")
+            "Pro Documents (*.pro);;All files (*)")
         if path:
             self.doLoad(path)
 
