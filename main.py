@@ -14,18 +14,18 @@ class GeometryCommand(QtGui.QUndoCommand):
 
     def undo(self):
         self.item.changeRect(self.f)
-        
+
     def redo(self):
         self.item.changeRect(self.t)
 
-class PdfPageItem(QtGui.QGraphicsItem): 
+class PdfPageItem(QtGui.QGraphicsItem):
     def __init__(self, page):
         QtGui.QGraphicsItem.__init__(self)
         self.page = page
         tmp=page.renderToImage(75, 75)
         self.rect = QtCore.QRectF(0, 0, tmp.width(), tmp.height())
         self.setFlag(QtGui.QGraphicsItem.ItemUsesExtendedStyleOption, True)
-        
+
     def boundingRect(self):
         return self.rect
 
@@ -44,7 +44,7 @@ class PropertiesModel(QtCore.QAbstractTableModel):
     def __init__(self, item):
         QtCore.QAbstractItemModel.__init__(self)
         self.item = item
-        
+
     def columnCount(self, parent):
         return 2
 
@@ -52,10 +52,10 @@ class PropertiesModel(QtCore.QAbstractTableModel):
         return len(self.item.properties)
 
     def data(self, index, role):
-        if not index.isValid(): return None  
+        if not index.isValid(): return None
         return "HAT"
 
-class ItemBase(QtGui.QGraphicsItem): 
+class ItemBase(QtGui.QGraphicsItem):
     def __init__(self, page):
         QtGui.QGraphicsItem.__init__(self)
         self.page = page
@@ -70,7 +70,7 @@ class ItemBase(QtGui.QGraphicsItem):
         self.setFlag(QtGui.QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QtGui.QGraphicsItem.ItemIsSelectable, True)
         self.properties=['width', 'height', 'top', 'left']
-        
+
     def boundingRect(self):
         r = QtCore.QRectF(self.innerRect)
         r.setLeft(r.left()-2)
@@ -80,16 +80,16 @@ class ItemBase(QtGui.QGraphicsItem):
         return r
 
     def changeRect(self, r):
-        self.prepareGeometryChange()        
+        self.prepareGeometryChange()
         self.innerRect = rect
 
     def paint(self, painter, option, widget):
         if self.isHovering or self.isSelected():
-            if self.isSelected():            
+            if self.isSelected():
                 pen = QtGui.QPen( QtCore.Qt.black, 0, QtCore.Qt.SolidLine)
             else:
                 pen = QtGui.QPen( QtCore.Qt.black, 0, QtCore.Qt.DotLine)
-            
+
             #painter.setCompositionMode(QtGui.QPainter.RasterOp_SourceXorDestination);
             painter.setPen(pen)
             painter.setBrush(QtCore.Qt.NoBrush)
@@ -99,16 +99,16 @@ class ItemBase(QtGui.QGraphicsItem):
             r.setRight(r.right()+1)
             r.setBottom(r.bottom()+1)
             painter.drawRect(self.boundingRect())
-            
+
     def onLeft(self, pos):
         return pos.x() <= self.innerRect.left() + 3
-    
+
     def onRight(self, pos):
         return pos.x() >= self.innerRect.right() - 3
 
     def onTop(self, pos):
         return pos.y() <= self.innerRect.top() + 3
-    
+
     def onBottom(self, pos):
         return pos.y() >= self.innerRect.bottom() - 3
 
@@ -125,7 +125,7 @@ class ItemBase(QtGui.QGraphicsItem):
                 self.resizeBottom = self.onBottom(p)
                 self.resizeLeft = self.onLeft(p)
                 self.resizeRight = self.onRight(p)
-            
+
             if not self.resizeTop and not self.resizeBottom and not self.resizeLeft and not self.resizeRight:
                 if event.modifiers() == QtCore.Qt.ControlModifier:
                     self.moveStart = (self.innerRect.topLeft(), p)
@@ -136,7 +136,7 @@ class ItemBase(QtGui.QGraphicsItem):
                 self.myEvent = True
         else:
             QtGui.QGraphicsItem.mousePressEvent(self, event)
-                
+
 
     def mouseMoveEvent(self, event):
         if self.myEvent:
@@ -148,12 +148,12 @@ class ItemBase(QtGui.QGraphicsItem):
             if self.resizeRight: self.innerRect.setRight(p.x())
             self.commandName="Resize item"
             if self.moveStart:
-                self.innerRect.moveTo( self.moveStart[0].x() + p.x() - self.moveStart[1].x(), 
+                self.innerRect.moveTo( self.moveStart[0].x() + p.x() - self.moveStart[1].x(),
                                        self.moveStart[0].y() + p.y() - self.moveStart[1].y())
                 self.commandName="Move item"
         else:
             QtGui.QGraphicsItem.mouseMoveEvent(self, event)
-            
+
     def mouseReleaseEvent(self, event):
         if self.myEvent:
             if self.innerRect != self.startRect:
@@ -168,7 +168,7 @@ class ItemBase(QtGui.QGraphicsItem):
     def hoverLeaveEvent(self, event):
         self.isHovering=False
         self.update()
-            
+
     def hoverMoveEvent(self, event):
         p=event.pos()
         if self.onLeft(p) and self.onTop(p):
@@ -185,13 +185,13 @@ class ItemBase(QtGui.QGraphicsItem):
             self.setCursor(QtCore.Qt.SizeVerCursor)
         else:
             self.setCursor(QtCore.Qt.OpenHandCursor)
-        
+
 class ImageItem(ItemBase):
     def __init__(self, page):
         ItemBase.__init__(self, page)
         self.image = QtGui.QImage("/home/jakobt/tux2.png")
         self.innerRect = QtCore.QRectF(100,100, self.image.width(), self.image.height())
-            
+
     def paint(self, painter, option, widget):
         painter.setRenderHint(QtGui.QPainter.SmoothPixmapTransform, True)
         painter.drawImage(self.innerRect, self.image, QtCore.QRectF(0, 0, self.image.width(), self.image.height()))
@@ -203,11 +203,11 @@ class ImageItem(ItemBase):
     def save(self, s):
         s << self.image
         s << self.innerRect
-        
+
     @staticmethod
     def id():
         return 1
-    
+
 class RectItem(ItemBase):
     def __init__(self, page):
         ItemBase.__init__(self, page)
@@ -245,7 +245,7 @@ class TextItem(QtGui.QGraphicsTextItem):
         if font:
             self.setFont(font)
         #self.setTextInteractionFlags(QtCore.Qt.TextEditorInteraction)
-    
+
     def save(self, s):
         s << self.toHtml()
         s << self.pos()
@@ -257,7 +257,7 @@ class TextItem(QtGui.QGraphicsTextItem):
         s >> pos
         self.setPos(pos)
         self.setHtml(html)
-        
+
     def getName(self):
         return "Text"
 
@@ -289,7 +289,7 @@ class ObjectTreeModel(QtCore.QAbstractItemModel):
     def __init__(self, project):
         QtCore.QAbstractItemModel.__init__(self)
         self.project = project
-        
+
     def columnCount(self, parent):
         return 1
 
@@ -301,8 +301,8 @@ class ObjectTreeModel(QtCore.QAbstractItemModel):
         else: return 0
 
     def data(self, index, role):
-        if not index.isValid(): return None  
-        if role != QtCore.Qt.DisplayRole: return None  
+        if not index.isValid(): return None
+        if role != QtCore.Qt.DisplayRole: return None
         i=index.internalPointer()
         if isinstance(i, Page): return "Page %i"%(i.number +1)
         elif isinstance(i, ItemBase): return i.getName()
@@ -316,7 +316,7 @@ class ObjectTreeModel(QtCore.QAbstractItemModel):
         elif isinstance(p, ItemBase):
             return self.createIndex(0, 0, p.page)
         return QtCore.QModelIndex()
-        
+
     def index(self, row, column, parent):
         p=self.project
         if parent.isValid(): p=parent.internalPointer()
@@ -334,7 +334,7 @@ class Page(QtCore.QObject):
         QtCore.QObject.__init__(self)
         self.number = i
         self.objects=[]
-        
+
         self.scene = QtGui.QGraphicsScene()
         self.scene.setBackgroundBrush(QtCore.Qt.gray)
         self.pageItem = PdfPageItem(project.document.page(i))
@@ -405,7 +405,7 @@ class Project(QtCore.QObject):
         pdfData = pdf.readAll()
         self.__loadPdf__(pdfData)
         self.path = QtCore.QString(os.path.splitext(str(path))[0]+".pep")
-        
+
     def save(self):
         f = QtCore.QFile(self.path)
         f.open(QtCore.QIODevice.WriteOnly)
@@ -417,7 +417,7 @@ class Project(QtCore.QObject):
         stream.writeUInt32(len(self.pages))
         for page in self.pages:
             page.save(stream)
-        
+
     def saveas(self, path):
         self.path = QtCore.QString(path)
         self.save()
@@ -429,7 +429,7 @@ class Project(QtCore.QObject):
         if stream.readUInt32() != 0x2a04c304:
             return None
         version = stream.readUInt32()
-        if version > 0: 
+        if version > 0:
             return None
         self.path = QtCore.QString()
         stream >> self.path
@@ -457,7 +457,7 @@ class Project(QtCore.QObject):
 
         painter = QtGui.QPainter()
         if not painter.begin(printer): return
-        
+
         first=True
         for page in self.pages:
             if first: first=False
@@ -478,7 +478,7 @@ class Project(QtCore.QObject):
         subprocess.call(["pdftk", path+"~1", "multibackground", path+"~2", "output", path])
         os.remove(path+"~1")
         os.remove(path+"~2")
-    
+
     def changeFont(self, font):
         self.font = font
         for page in self.pages:
@@ -495,7 +495,7 @@ class MainWindow(QtGui.QMainWindow):
         self.treeView.clearSelection()
         if page:
             self.treeView.selectionModel().setCurrentIndex(
-                self.project.treeModel.createIndex(0, 0, page), 
+                self.project.treeModel.createIndex(0, 0, page),
                 QtGui.QItemSelectionModel.ClearAndSelect )
 
     def getCurrentPage(self):
@@ -503,7 +503,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def currentObjectChanged(self, current, previous):
         p=current.internalPointer()
-        if isinstance(p, Page): 
+        if isinstance(p, Page):
             self.setCurrentPage(p)
         elif isinstance(p, ItemBase):
             self.setCurrentPage(p.page)
@@ -542,10 +542,10 @@ class MainWindow(QtGui.QMainWindow):
 
         #self.actionAddImage.triggered.connect(self.addImage)
         self.actionAddText.triggered.connect(self.addText)
-        
+
         print project.itemSelected
         project.itemSelected.connect(self.itemSelected)
-        
+
         toolGroup = QtGui.QActionGroup(self)
         toolGroup.addAction(self.actionSizeTool)
         toolGroup.addAction(self.actionRectangleTool)
@@ -557,11 +557,11 @@ class MainWindow(QtGui.QMainWindow):
         self.treeView.selectionModel().currentChanged.connect(self.currentObjectChanged)
 
         self.currentPageChanged.connect(self.view.currentPageChanged)
-        
+
         self.project = project
 
         self.handleFontChange()
-        
+
 
     def doNewProject(self, path):
         self.setCurrentPage(None)
@@ -584,7 +584,7 @@ class MainWindow(QtGui.QMainWindow):
 
     def saveas(self):
         path = QtGui.QFileDialog.getSaveFileName(
-            self, "Save Project", self.project.path if self.project.path else "", 
+            self, "Save Project", self.project.path if self.project.path else "",
             "Pro Docuemnts (*.pro);;All files (*)")
         if path:
             self.project.saveas(path)
@@ -654,7 +654,7 @@ def main():
 
     # for path in QtGui.QIcon.themeSearchPaths():
     #     print "%s/%s" % (path, QtGui.QIcon.themeName())
-    
+
     a=MainWindow()
     a.show()
     if len(app.arguments()) > 1:
@@ -664,7 +664,7 @@ def main():
         else:
             a.doNewProject(app.arguments()[1])
     sys.exit(app.exec_())
-    
+
 if __name__ == '__main__':
     main()
 
