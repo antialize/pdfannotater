@@ -141,7 +141,6 @@ class ItemBase(QtGui.QGraphicsItem):
         else:
             QtGui.QGraphicsItem.mousePressEvent(self, event)
 
-
     def mouseMoveEvent(self, event):
         if self.myEvent:
             p = event.pos()
@@ -547,7 +546,6 @@ class MainWindow(QtGui.QMainWindow):
         #view = PageView(None, main)
         self.currentPage = None
 
-
         #self.actionAddImage.triggered.connect(self.addImage)
         self.actionAddText.triggered.connect(self.addText)
 
@@ -569,7 +567,6 @@ class MainWindow(QtGui.QMainWindow):
         self.project = project
 
         self.handleFontChange()
-
 
     def doNewProject(self, path):
         self.setCurrentPage(None)
@@ -652,7 +649,6 @@ def main():
     global a
     app = QtGui.QApplication(sys.argv)
 
-
     #print QtGui.QIcon.setThemeName("oxygen")
 
     print QtGui.QIcon.fromTheme("document-new")
@@ -676,4 +672,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
