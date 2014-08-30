@@ -555,16 +555,16 @@ class MainWindow(QtGui.QMainWindow):
         self.textToolBar.addWidget(self.fontSizeCombo)
         self.fontSizeCombo.currentIndexChanged.connect(self.handleFontChange)
 
-     # fontColorToolButton = new QToolButton;
-     # fontColorToolButton->setPopupMode(QToolButton::MenuButtonPopup);
-     # fontColorToolButton->setMenu(createColorMenu(SLOT(textColorChanged()),
-     #                                              Qt::black));
-     # textAction = fontColorToolButton->menu()->defaultAction();
-     # fontColorToolButton->setIcon(createColorToolButtonIcon(
-     # ":/images/textpointer.png", Qt::black));
-     # fontColorToolButton->setAutoFillBackground(true);
-     # connect(fontColorToolButton, SIGNAL(clicked()),
-     #         this, SLOT(textButtonTriggered()));
+        # fontColorToolButton = new QToolButton;
+        # fontColorToolButton->setPopupMode(QToolButton::MenuButtonPopup);
+        # fontColorToolButton->setMenu(createColorMenu(SLOT(textColorChanged()),
+        #                                              Qt::black));
+        # textAction = fontColorToolButton->menu()->defaultAction();
+        # fontColorToolButton->setIcon(createColorToolButtonIcon(
+        # ":/images/textpointer.png", Qt::black));
+        # fontColorToolButton->setAutoFillBackground(true);
+        # connect(fontColorToolButton, SIGNAL(clicked()),
+        #         this, SLOT(textButtonTriggered()));
 
         project = Project()
         #view = PageView(None, main)
