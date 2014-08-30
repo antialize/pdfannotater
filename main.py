@@ -95,7 +95,7 @@ class ItemBase(QtGui.QGraphicsItem):
             else:
                 pen = QtGui.QPen(QtCore.Qt.black, 0, QtCore.Qt.DotLine)
 
-            #painter.setCompositionMode(QtGui.QPainter.RasterOp_SourceXorDestination);
+            #painter.setCompositionMode(QtGui.QPainter.RasterOp_SourceXorDestination)
             painter.setPen(pen)
             painter.setBrush(QtCore.Qt.NoBrush)
             r = QtCore.QRectF(self.innerRect)
@@ -277,7 +277,7 @@ class TextItem(QtGui.QGraphicsTextItem):
 
     def selectAll(self):
         c = self.textCursor()
-        c.beginEditBlock();
+        c.beginEditBlock()
         c.select(QtGui.QTextCursor.Document)
         c.insertHtml("Boo")
         setTextCursor(c)
@@ -476,7 +476,7 @@ class Project(QtCore.QObject):
     def export(self, path):
         printer = QtGui.QPrinter()
         printer.setColorMode(QtGui.QPrinter.Color)
-        printer.setOutputFormat(QtGui.QPrinter.PdfFormat);
+        printer.setOutputFormat(QtGui.QPrinter.PdfFormat)
         printer.setOutputFileName(path+"~1")
         printer.setPageMargins(0, 0, 0, 0, QtGui.QPrinter.Point)
         page = self.document.page(0)
@@ -670,9 +670,9 @@ class MainWindow(QtGui.QMainWindow):
         color = item.defaultTextColor()
         self.fontCombo.setCurrentFont(font)
         self.fontSizeCombo.setEditText(QtCore.QString().setNum(font.pointSize()))
-        self.boldAction.setChecked(font.weight() == QtGui.QFont.Bold);
-        self.italicAction.setChecked(font.italic());
-        self.underlineAction.setChecked(font.underline());
+        self.boldAction.setChecked(font.weight() == QtGui.QFont.Bold)
+        self.italicAction.setChecked(font.italic())
+        self.underlineAction.setChecked(font.underline())
 
 
 def main():
