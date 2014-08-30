@@ -5,6 +5,7 @@ import math
 import os
 import subprocess
 
+
 class GeometryCommand(QtGui.QUndoCommand):
     def __init__(self, item, f, t, text):
         QtGui.QUndoCommand.__init__(self, text)
@@ -17,6 +18,7 @@ class GeometryCommand(QtGui.QUndoCommand):
 
     def redo(self):
         self.item.changeRect(self.t)
+
 
 class PdfPageItem(QtGui.QGraphicsItem):
     def __init__(self, page):
@@ -40,6 +42,7 @@ class PdfPageItem(QtGui.QGraphicsItem):
         image = self.page.renderToImage(75*d, 75*d, left, top, right-left, bottom-top)
         painter.drawImage(QtCore.QRectF(left/d,top/d, (right-left)/d, (bottom-top)/d), image)
 
+
 class PropertiesModel(QtCore.QAbstractTableModel):
     def __init__(self, item):
         QtCore.QAbstractItemModel.__init__(self)
@@ -54,6 +57,7 @@ class PropertiesModel(QtCore.QAbstractTableModel):
     def data(self, index, role):
         if not index.isValid(): return None
         return "HAT"
+
 
 class ItemBase(QtGui.QGraphicsItem):
     def __init__(self, page):
@@ -186,6 +190,7 @@ class ItemBase(QtGui.QGraphicsItem):
         else:
             self.setCursor(QtCore.Qt.OpenHandCursor)
 
+
 class ImageItem(ItemBase):
     def __init__(self, page):
         ItemBase.__init__(self, page)
@@ -207,6 +212,7 @@ class ImageItem(ItemBase):
     @staticmethod
     def id():
         return 1
+
 
 class RectItem(ItemBase):
     def __init__(self, page):
@@ -329,6 +335,7 @@ class ObjectTreeModel(QtCore.QAbstractItemModel):
             return self.createIndex(row, column, p.objects[row])
         else: return None
 
+
 class Page(QtCore.QObject):
     def __init__(self, project, i):
         QtCore.QObject.__init__(self)
@@ -379,6 +386,7 @@ class Page(QtCore.QObject):
         for item in self.scene.selectedItems():
             if isinstance(item, TextItem):
                 item.setFont(font)
+
 
 class Project(QtCore.QObject):
     itemSelected = QtCore.pyqtSignal([QtGui.QGraphicsItem])
@@ -664,6 +672,7 @@ def main():
         else:
             a.doNewProject(app.arguments()[1])
     sys.exit(app.exec_())
+
 
 if __name__ == '__main__':
     main()
