@@ -55,7 +55,8 @@ class PropertiesModel(QtCore.QAbstractTableModel):
         return len(self.item.properties)
 
     def data(self, index, role):
-        if not index.isValid(): return None
+        if not index.isValid():
+            return None
         return "HAT"
 
 
@@ -145,10 +146,14 @@ class ItemBase(QtGui.QGraphicsItem):
         if self.myEvent:
             p = event.pos()
             self.prepareGeometryChange()
-            if self.resizeTop: self.innerRect.setTop(p.y())
-            if self.resizeBottom: self.innerRect.setBottom(p.y())
-            if self.resizeLeft: self.innerRect.setLeft(p.x())
-            if self.resizeRight: self.innerRect.setRight(p.x())
+            if self.resizeTop:
+                self.innerRect.setTop(p.y())
+            if self.resizeBottom:
+                self.innerRect.setBottom(p.y())
+            if self.resizeLeft:
+                self.innerRect.setLeft(p.x())
+            if self.resizeRight:
+                self.innerRect.setRight(p.x())
             self.commandName = "Resize item"
             if self.moveStart:
                 self.innerRect.moveTo( self.moveStart[0].x() + p.x() - self.moveStart[1].x(),
@@ -300,21 +305,30 @@ class ObjectTreeModel(QtCore.QAbstractItemModel):
 
     def rowCount(self, parent):
         p = self.project
-        if parent.isValid(): p = parent.internalPointer()
-        if isinstance(p, Project): return len(p.pages)
-        elif isinstance(p, Page): return len(p.objects)
-        else: return 0
+        if parent.isValid():
+            p = parent.internalPointer()
+        if isinstance(p, Project):
+            return len(p.pages)
+        elif isinstance(p, Page):
+            return len(p.objects)
+        else:
+            return 0
 
     def data(self, index, role):
-        if not index.isValid(): return None
-        if role != QtCore.Qt.DisplayRole: return None
+        if not index.isValid():
+            return None
+        if role != QtCore.Qt.DisplayRole:
+            return None
         i = index.internalPointer()
-        if isinstance(i, Page): return "Page %i" % (i.number + 1)
-        elif isinstance(i, ItemBase): return i.getName()
+        if isinstance(i, Page):
+            return "Page %i" % (i.number + 1)
+        elif isinstance(i, ItemBase):
+            return i.getName()
         return None
 
     def parent(self, index):
-        if not index.isValid(): return None
+        if not index.isValid():
+            return None
         p = index.internalPointer()
         if isinstance(p, Page):
             return self.createIndex(0, 0, p.project)
@@ -324,15 +338,20 @@ class ObjectTreeModel(QtCore.QAbstractItemModel):
 
     def index(self, row, column, parent):
         p = self.project
-        if parent.isValid(): p = parent.internalPointer()
-        if row < 0: return None
+        if parent.isValid():
+            p = parent.internalPointer()
+        if row < 0:
+            return None
         if isinstance(p, Project):
-            if row >= len(p.pages): return None
+            if row >= len(p.pages):
+                return None
             return self.createIndex(row, column, p.pages[row])
         elif isinstance(p, Page):
-            if row >= len(p.objects): return None
+            if row >= len(p.objects):
+                return None
             return self.createIndex(row, column, p.objects[row])
-        else: return None
+        else:
+            return None
 
 
 class Page(QtCore.QObject):
@@ -366,7 +385,8 @@ class Page(QtCore.QObject):
         for i in range(count):
             d = stream.readUInt32()
             for t in [ImageItem, RectItem, TextItem]:
-                if t.id() != d: continue
+                if t.id() != d:
+                    continue
                 item = t(self)
                 item.load(stream)
                 self.scene.addItem(item)
@@ -463,12 +483,15 @@ class Project(QtCore.QObject):
         printer.setPaperSize(page.pageSizeF(), QtGui.QPrinter.Point)
 
         painter = QtGui.QPainter()
-        if not painter.begin(printer): return
+        if not painter.begin(printer):
+            return
 
         first = True
         for page in self.pages:
-            if first: first = False
-            else: printer.newPage()
+            if first:
+                first = False
+            else:
+                printer.newPage()
             page.pageItem.hide()
             bg = page.scene.backgroundBrush()
             page.scene.setBackgroundBrush(QtGui.QBrush(QtCore.Qt.NoBrush))
@@ -496,7 +519,8 @@ class MainWindow(QtGui.QMainWindow):
     currentPageChanged = QtCore.pyqtSignal(Page)
 
     def setCurrentPage(self, page):
-        if page == self.currentPage: return
+        if page == self.currentPage:
+            return
         self.currentPage = page
         self.currentPageChanged.emit(page)
         self.treeView.clearSelection()
@@ -571,13 +595,15 @@ class MainWindow(QtGui.QMainWindow):
     def doNewProject(self, path):
         self.setCurrentPage(None)
         self.project.create(path)
-        if self.project.pages: self.setCurrentPage(self.project.pages[0])
+        if self.project.pages:
+            self.setCurrentPage(self.project.pages[0])
         self.handleFontChange()
 
     def newProject(self):
         path = QtGui.QFileDialog.getOpenFileName(
             self, "Open pdf file", "", "Pdf Docuemnts (*.pdf);;All files (*)")
-        if path: self.doNewProject(path)
+        if path:
+            self.doNewProject(path)
 
     def export(self):
         a, e = os.path.splitext(str(self.project.path))
@@ -597,17 +623,21 @@ class MainWindow(QtGui.QMainWindow):
     def doLoad(self, path):
         self.setCurrentPage(None)
         self.project.load(path)
-        if self.project.pages: self.setCurrentPage(self.project.pages[0])
+        if self.project.pages:
+            self.setCurrentPage(self.project.pages[0])
 
     def load(self):
         path = QtGui.QFileDialog.getOpenFileName(
             self, "Open Project", self.project.path if self.project.path else "",
             "Pro Docuemnts (*.pro);;All files (*)")
-        if path: self.doLoad(path)
+        if path:
+            self.doLoad(path)
 
     def save(self):
-        if not self.project.path: self.saveas()
-        else: self.project.save()
+        if not self.project.path:
+            self.saveas()
+        else:
+            self.project.save()
 
     def addImage(self):
         path = QtGui.QFileDialog.getOpenFileName(
