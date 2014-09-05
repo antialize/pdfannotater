@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>mainWindow</class>
+ <widget class="QMainWindow" name="mainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>PDFAnnotater</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -32,7 +32,7 @@
      <x>0</x>
      <y>0</y>
      <width>1142</width>
-     <height>27</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFoobar">
@@ -684,11 +684,17 @@
    </property>
   </action>
   <action name="actionFont">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Font</string>
    </property>
   </action>
   <action name="actionColor">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Color</string>
    </property>
@@ -736,7 +742,7 @@
   <connection>
    <sender>actionQuit</sender>
    <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>mainWindow</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -864,7 +870,7 @@
   <connection>
    <sender>actionSaveAs</sender>
    <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>mainWindow</receiver>
    <slot>saveas()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -880,7 +886,7 @@
   <connection>
    <sender>actionNewProject</sender>
    <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>mainWindow</receiver>
    <slot>newProject()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -896,7 +902,7 @@
   <connection>
    <sender>actionSaveProject</sender>
    <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>mainWindow</receiver>
    <slot>save()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -912,7 +918,7 @@
   <connection>
    <sender>actionOpenProject</sender>
    <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>mainWindow</receiver>
    <slot>load()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -928,7 +934,7 @@
   <connection>
    <sender>actionExportPDF</sender>
    <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>mainWindow</receiver>
    <slot>export()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -944,7 +950,7 @@
   <connection>
    <sender>actionExportSaveAndQuit</sender>
    <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>mainWindow</receiver>
    <slot>exportSaveAndQuit()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -960,7 +966,7 @@
   <connection>
    <sender>actionBold</sender>
    <signal>changed()</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>mainWindow</receiver>
    <slot>handleFontChange()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -976,7 +982,7 @@
   <connection>
    <sender>actionUnderline</sender>
    <signal>changed()</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>mainWindow</receiver>
    <slot>handleFontChange()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -992,7 +998,7 @@
   <connection>
    <sender>actionItalic</sender>
    <signal>changed()</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>mainWindow</receiver>
    <slot>handleFontChange()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1008,7 +1014,7 @@
   <connection>
    <sender>actionDelete</sender>
    <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
+   <receiver>mainWindow</receiver>
    <slot>deleteSelection()</slot>
    <hints>
     <hint type="sourcelabel">
